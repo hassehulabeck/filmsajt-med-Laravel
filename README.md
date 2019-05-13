@@ -49,6 +49,7 @@ Laravel följer MVC, dvs delar upp koden i
 * Models
 * Views
 * Controllers
+
 Detta innebär att allt som handlar om att **presentera** data sköts av Views. Det är i en view vi skriver HTML-kod.
 I en Model finns en massa inbyggda metoder som gör att vi lätt kan hämta och skicka data till och från databasen. Dessutom kan vi själva skriva instruktioner om hur modellen ska fungera.
 Controllern är den som oftast blir anropad när något ska göras. I en Controller finns bl a en massa **CRUD**-metoder, alltså de vi använder för att skapa data, hämta data, uppdatera datan och ta bort data. Controllern är "chefen", som säger till vad Model ska göra och vilken data som ska skickas till vilken View.
@@ -59,7 +60,7 @@ Modellen heter då **Product** (Stor initialbokstav är standard, samt singular�
 ## Artisan
 Laravel kommer med ett trevligt verktyg som heter artisan. Det använder vi för att med korta, kärnfulla kommandon skapa färdiga eller halvfärdiga filer som vi sedan kan redigera. På så sätt slipper vi skriva så mycket.
 Skriv nu 
-```
+```shellSession
 php artisan make:model Movie -mcr
 ```
 Följande sker i detta kommando
@@ -67,9 +68,10 @@ Följande sker i detta kommando
 * Artisan kör sitt make-kommando, i det här fallet för att skapa en Model.
 * Modellen heter Movie (notera initial versalbokstav)
 * -mcr betyder "När du skapar modellen, kan du då samtidigt skapa en: 
-** Migration (fil som kommer att skapa databastabellen)
-** Controller (som kommer att få namnet MovieController)
-** Resource (utrustar Controllern med en full uppsättning CRUD-metoder, så vi slipper skriva dem själv.)
+  * Migration (fil som kommer att skapa databastabellen)
+  * Controller (som kommer att få namnet MovieController)
+  * Resource (utrustar Controllern med en full uppsättning CRUD-metoder, så vi slipper skriva dem själv.)
+
 Resultatet ser förhoppningsvis ut så här i terminalen:
 ```shellSession
 $ php artisan make:model Movie -mcr
@@ -77,4 +79,127 @@ Model created successfully.
 Created Migration: 2019_05_13_185423_create_movies_table
 Controller created successfully.
 ```
+## Koden i editorn
+Om du nu öppnar din texteditor och öppnar hela katalogen "filmsajt" som du skapat någonstans på din dator, så ska vi titta lite på var olika filer hamnar.
+
+```shellSession
+app/
+artisan*
+bootstrap/
+config/
+database/
+public/
+resources/
+routes/
+storage/
+tests/
+vendor/
+./
+../
+.editorconfig
+.env
+.env.example
+.gitattributes
+.gitignore
+webpack.mix.js
+composer.json
+package.json
+composer.lock
+yarn.lock
+server.php
+phpunit.xml
+.styleci.yml
+```
+Den **Model** som du nyss skapade hittar du i katalogen app.
+**Controllern** hittar du i app/Http/Controllers.
+Öppna filen ```MovieController.php``` i din editor och titta snabbt igenom att den ser ut så här:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Movie;
+use Illuminate\Http\Request;
+
+class MovieController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Movie  $movie
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Movie  $movie
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Movie  $movie
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Movie $movie)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Movie  $movie
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Movie $movie)
+    {
+        //
+    }
+}
+```
+Som du ser finns alla CRUD-metoder (Create, Read (heter Index), Update och Delete) samt ytterligare tre (Store, Show och Edit) som vi behöver för att effektivt hantera data.
 
