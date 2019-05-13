@@ -111,7 +111,11 @@ phpunit.xml
 .styleci.yml
 ```
 Den **Model** som du nyss skapade hittar du i katalogen app.
+
 **Controllern** hittar du i app/Http/Controllers.
+
+**Migrationsfilen** ligger i database/migrations
+
 Öppna filen ```MovieController.php``` i din editor och titta snabbt igenom att den ser ut så här:
 
 ```php
@@ -201,5 +205,79 @@ class MovieController extends Controller
     }
 }
 ```
-Som du ser finns alla CRUD-metoder (Create, Read (heter Index), Update och Delete) samt ytterligare tre (Store, Show och Edit) som vi behöver för att effektivt hantera data.
+Som du ser finns alla CRUD-metoder (Create, Read (heter Index), Update och Delete (heter Destroy)) samt ytterligare tre (Store, Show och Edit) som vi behöver för att effektivt hantera data. Vi ska titta närmare på dem senare.
+## Lägg till data
+Öppna nu den migrationsfil som du skapade. Vi ska editera den lite grann så att den i sin tur kan skapa en databastabell åt oss. Filen heter något i stil med ```2019_05_13_185423_create_movies_table.php```
+Ändra i filen så att du har följande innehåll:
+```php
+    public function up()
+    {
+        Schema::create('movies', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('title');
+            $table->year('year');
+            $table->string('director');
+            $table->timestamps();
+        });
+    }
+```
+I funktionen up definierar vi vilka kolumner som databastabellen 'movies' ska ha. Den första ('id') och den sista ('timestamps') ligger med som förval, och de är bra att ha. Låt de alltså ligga kvar och fyll i resten.
+Vi startar enkelt och lagrar bara filmens titel, året då den hade premiär samt vem som regisserat.
+Spara filen och gå till terminalen. Det är dags att låta migrationsfilen jobba.
+## Migrera
+Men innan vi kan göra detta måste vi justera en fil. Det är nämligen så att LAMP/MAMP/XAMPP vanligtvis använder en lite äldre version av MySQL, vilket skapar lite problem med Laravel. 
+Därför ska du leta upp filen ```app/Providers/AppServiceProvider.php``` och ändra till följande:
+```php
+public function boot()
+{
+    Schema::defaultStringLength(191);
+}
+```
+Samt ett stycke högre upp i filen (ovanför rad 8, som börjar med ordet Class):
+```php
+use Illuminate\Support\Facades\Schema;
+```
+Spara, och gå sedan tillbaka till terminalen och skriv
+```shellSession
+php artisan migrate
+```
 
+Då bör du få se följande rader
+```php
+$ php artisan migrate
+Migration table created successfully.
+Migrating: 2014_10_12_000000_create_users_table
+Migrated:  2014_10_12_000000_create_users_table
+Migrating: 2014_10_12_100000_create_password_resets_table
+Migrated:  2014_10_12_100000_create_password_resets_table
+Migrating: 2019_05_13_185423_create_movies_table
+Migrated:  2019_05_13_185423_create_movies_table
+```
+som talar om för dig att det har gått bra med migreringarna, dvs att tabellerna i databasen har skapats. Om det istället gått dåligt och du fått felmeddelanden, så googlar du på dem så att du blir mer kunnig.
+
+## Lägg till en film
+Gå nu till PHPMyAdmin och välj databasen 'filmsajt' samt tabellen 'movies'. Den är tom, så vi ska manuellt lägga till en film. Skriv in "Hets", 1944 och "Alf Sjöberg" och tryck "Go" (eller vad det nu heter på svenska).
+## Tinker
+Lägg märke till att vi nästan inte skrivit en rad kod (egentligen har vi skrivit fem, men vem håller räkningen?), och nu ska du få se hur häftig Model egentligen är. För att du ska få se kraften i den ska vi använda verktyget **tinker**
+Gå till terminalen och skriv ```php artisan tinker```
+När du gjort det kommer du in i ett så kallat REPL (Read Evalute Print Loop), dvs ett läge där du kan skriva lite andra kommandon.
+Skriv nu ```App\Movie::all()``` och tryck ENTER.
+Om det funkar som det ska bör du se följande:
+```shellSession
+>>> App\Movie::all()
+=> Illuminate\Database\Eloquent\Collection {#2925
+     all: [
+       App\Movie {#2926
+         id: 1,
+         title: "Hets",
+         year: 1944,
+         director: "Alf Sjöberg",
+         created_at: null,
+         updated_at: null,
+       },
+     ],
+   }
+>>>
+
+Visst är det häftigt? Modellen Movie har med den inbyggda metoden all() förmågan att hämta alla filmer ur databastabellen movies. Lägg märke till plural- och singularformerna (movies och Movie). Modellen **Movie** är på det viset kopplad till databastabellen **movies**.
+```
