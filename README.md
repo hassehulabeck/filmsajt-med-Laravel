@@ -40,21 +40,41 @@ Gå till terminalen och skriv ```php artisan serve``` och se vilken localhost-ad
 $ php artisan serve
 Laravel development server started: <http://127.0.0.1:8000>
 ```
-
+Om du har fått igång den bör du se ordet "Laravel" samt några länkar på den adressen. Om webbservern inte har startat, så har du förmodligen fått ett felmeddelande. Läs igenom det och googla på väl valda delar av det. Det brukar alltid finnas intressant information i början av felmeddelandet, samt kanske någon felkod?
+När du tittat lite på den ganska ointressanta sidan, så kan du gå tillbaka till terminalen och stänga ner den med ```ctrl + c```.
+Vi behöver terminalen till andra grejer nu (men du kan ju också öppna **två** terminaler, så slipper du starta och stänga av webbservern.)
 ## MVC
-Nu ska vi stanna upp lite och fundera. Laravel följer MVC, dvs delar upp koden i 
+Nu är det dags att skapa grejer. Vi ska börja med att skapa lite filer som behövs för att både skapa en databastabell och sedan kommunicera med densamma. 
+Laravel följer MVC, dvs delar upp koden i 
 * Models
 * Views
 * Controllers
 Detta innebär att allt som handlar om att **presentera** data sköts av Views. Det är i en view vi skriver HTML-kod.
-I en Model finns en massa inbyggda metoder som gör att vi kan kommunicera med en databas. Dessutom kan vi själva skriva instruktioner om hur modellen ska fungera.
-Controllern är den som oftast blir anropad när något ska göras. I en Controller finns bl a en massa **CRUD**-metoder, alltså de vi använder för att skapa data, hämta data, uppdatera datan och ta bort data.
+I en Model finns en massa inbyggda metoder som gör att vi lätt kan hämta och skicka data till och från databasen. Dessutom kan vi själva skriva instruktioner om hur modellen ska fungera.
+Controllern är den som oftast blir anropad när något ska göras. I en Controller finns bl a en massa **CRUD**-metoder, alltså de vi använder för att skapa data, hämta data, uppdatera datan och ta bort data. Controllern är "chefen", som säger till vad Model ska göra och vilken data som ska skickas till vilken View.
 ### Var ska man börja?
-En bra metod är att börja med Model. Genom att definiera vad den är så blir våran programmerin tydligare. Så vi startar där. 
-En nyckelregel är att ha en model per databastabell. Om tabellen ska ha produkter, så bör den i databasen heta **products** (pluraländelse, eftersom en tabell förväntas innehålla flera produkter.)
+En bra metod är att börja med Model. Genom att definiera vad den är så blir våran programmering tydligare. Så vi startar där. 
+En nyckelregel är att ha en model per databastabell. Om tabellen ska innehålla produkter, så bör den heta **products** (pluraländelse, eftersom en tabell förväntas innehålla flera produkter.)
 Modellen heter då **Product** (Stor initialbokstav är standard, samt singularändelse, eftersom modellen beskriver vad *en* produkt är.)
 ## Artisan
 Laravel kommer med ett trevligt verktyg som heter artisan. Det använder vi för att med korta, kärnfulla kommandon skapa färdiga eller halvfärdiga filer som vi sedan kan redigera. På så sätt slipper vi skriva så mycket.
-Skriv nu ```php artisan make:model Movie -mcr```
-
+Skriv nu 
+```
+php artisan make:model Movie -mcr
+```
+Följande sker i detta kommando
+* PHP exekverar artisan
+* Artisan kör sitt make-kommando, i det här fallet för att skapa en Model.
+* Modellen heter Movie (notera initial versalbokstav)
+* -mcr betyder "När du skapar modellen, kan du då samtidigt skapa en: 
+** Migration (fil som kommer att skapa databastabellen)
+** Controller (som kommer att få namnet MovieController)
+** Resource (utrustar Controllern med en full uppsättning CRUD-metoder, så vi slipper skriva dem själv.)
+Resultatet ser förhoppningsvis ut så här i terminalen:
+```shellSession
+$ php artisan make:model Movie -mcr
+Model created successfully.
+Created Migration: 2019_05_13_185423_create_movies_table
+Controller created successfully.
+```
 
