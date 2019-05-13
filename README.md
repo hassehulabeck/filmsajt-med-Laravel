@@ -259,8 +259,11 @@ som talar om för dig att det har gått bra med migreringarna, dvs att tabellern
 Gå nu till PHPMyAdmin och välj databasen 'filmsajt' samt tabellen 'movies'. Den är tom, så vi ska manuellt lägga till en film. Skriv in "Hets", 1944 och "Alf Sjöberg" och tryck "Go" (eller vad det nu heter på svenska).
 ## Tinker
 Lägg märke till att vi nästan inte skrivit en rad kod (egentligen har vi skrivit fem, men vem håller räkningen?), och nu ska du få se hur häftig Model egentligen är. För att du ska få se kraften i den ska vi använda verktyget **tinker**
+
 Gå till terminalen och skriv ```php artisan tinker```
+
 När du gjort det kommer du in i ett så kallat REPL (Read Evalute Print Loop), dvs ett läge där du kan skriva lite andra kommandon.
+
 Skriv nu ```App\Movie::all()``` och tryck ENTER.
 Om det funkar som det ska bör du se följande:
 ```shellSession
@@ -280,4 +283,9 @@ Om det funkar som det ska bör du se följande:
 >>>
 ```
 Visst är det häftigt? Modellen Movie har med den inbyggda metoden all() förmågan att hämta alla filmer ur databastabellen movies. Lägg märke till plural- och singularformerna (movies och Movie). Modellen **Movie** är på det viset kopplad till databastabellen **movies**.
+Prova att skriva ```App\Movie::findOrFail(1)```
+Du kommer då förmodligen att få samma resultat, men med en annan metod.
+När du är klar att gå vidare skriver du ```exit``` vilket stänger tinker.
 
+## Seeda
+/Kommer inom kort
