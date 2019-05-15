@@ -345,4 +345,39 @@ Om du tycker att namn enbart är engelska, så beror det på en inställning i f
 Skapa en migration-fil, en model, en controller och en factory för detta. Jag tycker att egenskaperna/kolumnerna name, birthday och country räcker till en början.
 
 ## Relationer mellan tabeller
-/ På gång.
+Det är kul med två tabeller men de hänger inte ihop på något sätt. Om man tittar på vad man får ut i **tinker** från de båda tabellerna, så finns det ingen egenskap/kolumn som binder ihop tabellerna, dvs de båda tabellerna har ingen relation till varandra. 
+```shellSession
+$ php artisan tinker
+Psy Shell v0.9.9 (PHP 7.2.1 — cli) by Justin Hileman
+>>> App\Actor::find(2)
+=> App\Actor {#2925
+     id: 2,
+     name: "Tina Norberg",
+     birthday: "1978-05-23",
+     country: "Komorerna",
+     created_at: "2019-05-15 08:27:37",
+     updated_at: "2019-05-15 08:27:37",
+   }
+>>> App\Movie::find(2)
+=> App\Movie {#139
+     id: 2,
+     title: "Libero molestias.",
+     year: 1975,
+     director: "Prof. Leta Cummerata Sr.",
+     created_at: "2019-05-15 07:43:56",
+     updated_at: "2019-05-15 07:43:56",
+   }
+```
+Och om vi vill veta vilken skådespelare som varit med i vilken film, eller vilka filmer en viss skådespelare varit med i, så måste vi lösa det problemet.
+### Många-till-många?
+Relationer mellan databastabeller i SQL kan delas in i tre sorter:
+* En till en
+  * En till en är förhållandet mellan en person och ett körkort. En person har aldrig fler än ett körkort, och ett körkort kan inte delas av flera personer.
+* En till många
+  * En till många kan vara en person och dennes bilar, för att fortsätta fordonsexemplet. En person kan äga flera bilar, men en bil kan inte ägas av flera personer (i alla fall inte i vårt exempel).
+* Många till många
+  * Actors och Movies är ett bra exempel på många till många, då en skådespelare kan vara med i flera filmer, och en film vanligtvis består av många skådespelare.
+  
+Så hur beskriver vi ett många till många-förhållande mellan skådespelare och film? Enklast är att skapa en så kallad "pivot-tabell", vilken innehåller få kolumner men många rader, och varje rad innehåller information om att en skådespelare varit med i en film. Utöver detta har tabellen en egen id-kolumn, så totalt har vi tre rader.
+
+
