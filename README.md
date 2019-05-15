@@ -237,6 +237,8 @@ Samt ett stycke högre upp i filen (ovanför rad 8, som börjar med ordet Class)
 ```php
 use Illuminate\Support\Facades\Schema;
 ```
+(Om du inte gör dessa ändringar får du [detta fel.](https://laravel-news.com/laravel-5-4-key-too-long-error)
+
 Spara, och gå sedan tillbaka till terminalen och skriv
 ```shellSession
 php artisan migrate
@@ -287,5 +289,39 @@ Prova att skriva ```App\Movie::findOrFail(1)```
 Du kommer då förmodligen att få samma resultat, men med en annan metod.
 När du är klar att gå vidare skriver du ```exit``` vilket stänger tinker.
 
-## Seeda
-/Kommer inom kort
+## Seed & factories
+När databastabellerna är strukturerade ska vi börja befolka dem med värden. Ett sätt att göra detta är att manuellt skriva in dem i PHPMyAdmin, men det är bättre att använda **seeders*.
+
+En seeder skapar så kallad "mock-data", så att vi kan testa webbplatsen utan att själva behöva registrera användare i mängd eller liknande. I Laravel finns det en fil ```database/seeds/DatabaseSeeder.php``` i vilken vi skriver in på vilket sätt vi vill skapa mock-data.
+
+Det vanligaste sättet är att använda en **Factory**, vilket är en funktion som producerar flera användare, produkter, movies eller vad vi nu vill ha för något. I den factory-fil vi ska skapa definierar vi hur de olika kolumnerna i databastabellen ska fyllas, och ett utmärkt tillägg för att göra detta på ett sätt som skapar meningsfulla värden är att använda [Faker av @fzaninotto](https://github.com/fzaninotto/Faker#installation). Detta tillägg installerar du genom att i terminalen skriva
+```shellSession
+composer require fzaninotto/faker
+```
+Därefter skapar vi en factory för vår movies-tabell genom att i terminalen skriva
+```shellSession
+php artisan make:factory MovieFactory
+```
+Öppna sedan denna fil (database/factories/MovieFactory) i din editor och fyll i enligt följande:
+```php
+$factory->define(Model::class, function (Faker $faker) {
+    $slump = mt_rand(1,6);
+    return [
+        'title' => $faker->sentence($nbWords = $slump, $variableNbWords = true),
+        'year' => $faker->year(),
+        'director' => $faker->name,
+    ];
+});
+```
+och redigera sedan filen ```database/seeds/DatabaseSeeder.php``` så att den använder vår MovieFactory:
+```php
+    public function run()
+    {
+        factory(App\Movie::class, 10)->create();
+    }
+```
+och till slut, för att göra verklighet av våra "ansträngningar", skriver vi följande i terminalen
+```shellSession
+php artisan db:seed
+```
+
