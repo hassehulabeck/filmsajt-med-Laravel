@@ -300,8 +300,10 @@ composer require fzaninotto/faker
 ```
 Därefter skapar vi en factory för vår movies-tabell genom att i terminalen skriva
 ```shellSession
-php artisan make:factory MovieFactory
+php artisan make:factory MovieFactory --model=Movie
 ```
+Genom att skriva in tillägget "--model=Movie" får vi en koppling mellan factory och model, vilket gör att mer av filen blir färdigskriven.
+
 Öppna sedan denna fil (database/factories/MovieFactory) i din editor och fyll i enligt följande:
 ```php
 $factory->define(Model::class, function (Faker $faker) {
@@ -324,4 +326,23 @@ och till slut, för att göra verklighet av våra "ansträngningar", skriver vi 
 ```shellSession
 php artisan db:seed
 ```
+Om du tycker att namn enbart är engelska, så beror det på en inställning i filen ```config/app.php``` där du kan ändra värdet i faker_locale till exempelvis "sv_SE":
+```php
+    /*
+    |--------------------------------------------------------------------------
+    | Faker Locale
+    |--------------------------------------------------------------------------
+    |
+    | This locale will be used by the Faker PHP library when generating fake
+    | data for your database seeds. For example, this will be used to get
+    | localized telephone numbers, street address information and more.
+    |
+    */
 
+    'faker_locale' => 'en_US',
+```
+### Uppgift: Skapa en liknande Actors-tabell
+Skapa en migration-fil, en model, en controller och en factory för detta. Jag tycker att egenskaperna/kolumnerna name, birthday och country räcker till en början.
+
+## Relationer mellan tabeller
+/ På gång.
