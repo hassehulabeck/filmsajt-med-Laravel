@@ -1,8 +1,7 @@
 # En filmsajt mha Laravel
 Nedan följer en guide till att skapa en webbapplikation (webbplats) för att visa info om filmer och skådespelare.
 ## Installation
-Använd din terminal (Git bash, terminal e dyl)
-Installeras helst via  [composer](https://getcomposer.org/)
+Använd din terminal (Git bash, terminal e dyl) eftersom Laravel helst installeras via  [composer](https://getcomposer.org/)
 När det är installerat kan du skriva ```composer global require "laravel/installer"``` för att installera Laravel. 
 ## Börja bygga
 Därefter skapar du ett projekt genom att skriva ```laravel new filmsajt```
