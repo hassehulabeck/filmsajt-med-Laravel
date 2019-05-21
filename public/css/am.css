@@ -1,0 +1,6 @@
+.actor,
+.movie {
+    border: thin solid orange;
+    padding: .5em;
+    margin: .2em;
+}
