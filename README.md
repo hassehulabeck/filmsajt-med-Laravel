@@ -378,6 +378,71 @@ Relationer mellan databastabeller i SQL kan delas in i tre sorter:
 * Många till många
   * Actors och Movies är ett bra exempel på många till många, då en skådespelare kan vara med i flera filmer, och en film vanligtvis består av många skådespelare.
   
-Så hur beskriver vi ett många till många-förhållande mellan skådespelare och film? Enklast är att skapa en så kallad "pivot-tabell", vilken innehåller få kolumner men många rader, och varje rad innehåller information om att en skådespelare varit med i en film. Utöver detta har tabellen en egen id-kolumn, så totalt har vi tre rader.
+Så hur beskriver vi ett många till många-förhållande mellan skådespelare och film? Enklast är att skapa en så kallad "pivot-tabell", vilken innehåller få kolumner men många rader, och varje rad innehåller information om att en skådespelare varit med i en film. Utöver detta har tabellen en egen id-kolumn, så totalt har vi tre rader (id, actor_id, movie_id). Laravel brukar sätta ihop en pivottabell genom att slå ihop de båda tabellnamnen alfabetiskt sorterade, med ett underscore emellan, och kolumnerna i tabellen brukar se ut enligt formeln tabellens-namn+\_+id 
+
+```shellSession
+$ php artisan make:migration create_actor_movie_table
+```
+
+Pivot-tabeller är något som vi får konstruera själv i Laravel (om vi inte installerar [tillägget Generetors extended](https://github.com/laracasts/Laravel-5-Generators-Extended))
+
+Därefter editerar vi vår pivot-migration så att den ser ut så här:
+```php
+    public function up()
+    {
+        Schema::create('actor_movie', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->bigInteger('actor_id')->unsigned()->nullable();
+            $table->foreign('actor_id')->references('id')
+                  ->on('actors')->onDelete('cascade');
+      
+            $table->bigInteger('movie_id')->unsigned()->nullable();
+            $table->foreign('movie_id')->references('id')
+                  ->on('movies')->onDelete('cascade');
+    
+            $table->timestamps();        
+        });
+    }
+```
+Observera att kolumnerna actor_id och movie_id i vår pivot-tabell har typen **bigInteger**. Detta för att den ska kunna lagra samma typ av värde som ligger i respektive actors- och movietabell.
+Därefter gör vi en migration
+
+```shellSession
+php artisan migrate
+``` 
+
+Och sedan ska vi redigera modellerna Actor och Movie, så att de får relationer till varandra. Eftersom vi tidigare konstaterat att det rör sig om many-to-many-förhållande, så använder vi ORMs belongsToMany-metod.
+
+```php
+class Actor extends Model
+{
+    public function movies() {
+        return $this->belongsToMany('App\Movie');
+    }
+}
+```
+Detta innebär att modellen Actor nu har en ny egenskap (movies), vilket ska visa information om alla de filmer som skådespelaren varit med i.
+
+På motsvarande sätt skriver du i modellen Movie, så att den får en koppling till actors.
+
+Därefter seedar vi alla tre tabeller, så att actors befolkas med skådespelare, movies med filmer och actor_movie med referenser till de båda. I filen ```DatabaseSeeder.php``` kan man skriva in
+```php
+public function run()
+    {
+        factory(App\Actor::class, 100)->create();
+        factory(App\Movie::class, 30)->create()->each(function($a) {
+            $slumptal = mt_rand(1, 20);
+            $a->actors()->attach(App\Actor::all()->random($slumptal));
+        });
+    }
+```
+vilket då skapar 100 skådisar, 30 filmer och för varje film ett slumpvist antal rader, dvs mellan 1-20 skådisar per film, när vi seedar.
+```shellSession
+php artisan db:seed
+``` 
+
+## paus
+Gå och drick lite saft eller stå upp och sträck ut kroppen lite eller...
 
 
