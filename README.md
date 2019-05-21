@@ -406,10 +406,33 @@ Därefter editerar vi vår pivot-migration så att den ser ut så här:
     }
 ```
 Observera att kolumnerna actor_id och movie_id i vår pivot-tabell har typen **bigInteger**. Detta för att den ska kunna lagra samma typ av värde som ligger i respektive actors- och movietabell.
-Därefter gör vi en migration
+Därefter gör vi först en rollback följt av en migration. En rollback tar bort befintliga tabeller i databasen, vilket kan vara nödvändigt då och då. Nu är ett bra tillfälle.
 
 ```shellSession
-php artisan migrate
+$ php artisan migrate:rollback
+Rolling back: 2019_05_21_065952_create_actor_movie_table
+Rolled back:  2019_05_21_065952_create_actor_movie_table
+Rolling back: 2019_05_15_081708_create_actors_table
+Rolled back:  2019_05_15_081708_create_actors_table
+Rolling back: 2019_05_13_185423_create_movies_table
+Rolled back:  2019_05_13_185423_create_movies_table
+Rolling back: 2014_10_12_100000_create_password_resets_table
+Rolled back:  2014_10_12_100000_create_password_resets_table
+Rolling back: 2014_10_12_000000_create_users_table
+Rolled back:  2014_10_12_000000_create_users_table
+
+hans@LAPTOP-A0NBCAJK MINGW64 /c/MAMP/htdocs/filmsajt
+$ php artisan migrate
+Migrating: 2014_10_12_000000_create_users_table
+Migrated:  2014_10_12_000000_create_users_table
+Migrating: 2014_10_12_100000_create_password_resets_table
+Migrated:  2014_10_12_100000_create_password_resets_table
+Migrating: 2019_05_13_185423_create_movies_table
+Migrated:  2019_05_13_185423_create_movies_table
+Migrating: 2019_05_15_081708_create_actors_table
+Migrated:  2019_05_15_081708_create_actors_table
+Migrating: 2019_05_21_065952_create_actor_movie_table
+Migrated:  2019_05_21_065952_create_actor_movie_table
 ``` 
 
 Och sedan ska vi redigera modellerna Actor och Movie, så att de får relationer till varandra. Eftersom vi tidigare konstaterat att det rör sig om many-to-many-förhållande, så använder vi ORMs belongsToMany-metod.
