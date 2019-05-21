@@ -6,7 +6,7 @@
         <p>Kommer från {{ $actor[0]->country }} </p>    
         <h3>Har varit med i följande filmer</h3>
         @foreach ($actor[0]->movies as $movie)
-            <a href="/movies/{{$movie->id}} "> {{ $movie->title }} </a><br/>
+            <a href="/movies/{{$movie->id}} "> {{ $movie->title }}, ({{ $movie->year }}) </a><br/>
         @endforeach
     </div> 
 @endsection

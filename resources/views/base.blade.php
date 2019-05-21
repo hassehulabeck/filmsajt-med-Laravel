@@ -20,6 +20,13 @@
     <link href="{{ asset('css/am.css') }}" rel="stylesheet">
 </head>
 <body>
-    @yield('main')
+    <div class="container">
+            <div class="links">
+                    <a href="/actors">Actors</a>
+                    <a href="/movies">Movies</a>
+                </div>
+            
+            @yield('main')
+    </div>
 </body>
 </html>
