@@ -469,6 +469,12 @@ vilket då skapar 100 skådisar, 30 filmer och för varje film ett slumpvist ant
 ```shellSession
 php artisan db:seed
 ``` 
+### Prova med tinker
+Använd nu tinker för att se om databasrelationerna fungerar. 
+```shellSession
+$actor = App\Actor::find(x) // x ska vara ett id-nummer för en actor. Kolla vilka värden du har i din databas.
+$actor->movies // Visar info om vilka filmer skådespelaren varit med i. Kan vara null, det beror ju hur seedningen är gjord.
+```
 
 ## paus
 Gå och drick lite saft eller stå upp och sträck ut kroppen lite eller...
