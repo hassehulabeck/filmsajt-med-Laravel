@@ -479,4 +479,52 @@ $actor->movies // Visar info om vilka filmer skådespelaren varit med i. Kan var
 ## paus
 Gå och drick lite saft eller stå upp och sträck ut kroppen lite eller...
 
+## Views
+Nu är det dags att skapa views som kan visa all information på ett snyggt sätt. I katalogen ```resources/views``` skapar jag först två filer (base.blade.php och start.blade.php). Laravel använder ett så kallat **template-system** som heter blade, därav namnet på filerna.
+
+I base.blade.php lägger jag in generell info som gäller för alla mina webbsidor, dvs början på HTML-koden, HEAD-elementet med nödvändig info där etc. Utöver det skapar jag en yta (yield) där andra views kan lägga sin information/data.
+```php
+    <body>
+        <div class="container">
+                <div class="links">
+                    <a href="/actors">Actors</a>
+                    <a href="/movies">Movies</a>
+                </div>
+                @yield('main')
+        </div>
+    </body>
+</html>
+```
+I start.blade.php lägger jag enbart den info som ska ligga på startsidan. För att denna view ska kunna använda base.blade.php skriver jag följande kod:
+```php
+@extends('base')
+
+@section('main')
+
+    <h1>Hej och välkomna till Actors & Movies</h1>
+
+@endsection('main')
+```
+Extends betyder att den här viewen bygger på base(.blade.php), och section betyder att det som står mellan kommer att hamna i ytan "main".
+
+### View-kataloger
+För att hålla isär views som sysslar med olika saker, så är det bra att skapa kataloger i view. Mina heter "actor" och "movie", och båda innehåller filerna index.blade.php och show.blade.php. De här filerna heter detsamma som metoderna i respektive Controller, och det är en bra standard att följa, eftersom det underlättar när du felsöker.
+
+index.blade.php kommer att visa alla Actors eller Movies, medan show.blade.php kommer att visa en specifik Actor eller Movie. För att få detta att fungera så ska vi först editera metoderna i respektive Controller. Låt oss börja med ActorController.
+
+## Controller-metoder
+Index-metoden ska hämta alla actors och skicka dem till lämplig view, nämligen den index.blade.php som ligger i katalogen ```resources/views/actor```
+Därför skriver vi så här och använder då Actor-modellen.
+```php
+    public function index()
+    {
+        $actors = Actor::orderBy('name')->paginate(20);
+        return view('actor.index', [
+            'actors' => $actors
+        ]);
+    }
+```
+Variabeln $actors får värdet av vad Actor-modellen hämtar (orderBy()-tillägget sorterar och paginate() skapar en färdig paginering av så många objekt per sida.
+
+Metoden returnerar rätt view (här skriver vi katalog punkt view) och skickar även med en array som innehåller värden, i det här fallet lägger vi variabeln $actors som det värde som går under namnet actors inne i viewen.
 
