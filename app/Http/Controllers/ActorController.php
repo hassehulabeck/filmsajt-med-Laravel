@@ -50,7 +50,6 @@ class ActorController extends Controller
      */
     public function show(Actor $actor)
     {
-        $actor = Actor::find($actor);
         return view('actor.show', [
             'actor' => $actor
         ]);
