@@ -526,5 +526,56 @@ Därför skriver vi så här och använder då Actor-modellen.
 ```
 Variabeln $actors får värdet av vad Actor-modellen hämtar (orderBy()-tillägget sorterar och paginate() skapar en färdig paginering av så många objekt per sida.
 
-Metoden returnerar rätt view (här skriver vi katalog punkt view) och skickar även med en array som innehåller värden, i det här fallet lägger vi variabeln $actors som det värde som går under namnet actors inne i viewen.
+Metoden returnerar rätt view (här skriver vi katalog punkt view) och skickar även med en array som innehåller värden, i det här fallet lägger vi variabeln $actors som det värde som går under namnet actors inne i viewen. Lägg märke till att vi använder pluralformen actors och inte singularformen actor.
 
+I metoden show skickar vi in aktuell Actor som ett argument, så vi behöver inte göra mer än att omdirigera informationen.
+```php
+    public function show(Actor $actor)
+    {
+        return view('actor.show', [
+            'actor' => $actor
+        ]);
+    }
+```
+Som synes använder vi här singularformen actor, för att vara tydlig med att det bara rör sig om en actor, inte flera. 
+
+Vi skickar denna information till den view som anges (actor.show).
+
+### Skapa index- och show-views.
+Nu när vi har skapat de här metoderna är det dags att skriva ihop två views för actor. Vi börjar med index.blade.php (som ska ligga i resources/views/actor).
+```php
+@extends('base')
+
+@section('main')
+    @foreach($actors as $actor) 
+        <div class="actor">
+            <h1>{{ $actor->name }}</h1>
+            <h4>Har medverkat i följande filmer:</h4>
+            @foreach ($actor->movies as $movie)
+                <a href="/movies/{{$movie->id}}"> {{ $movie->title }}, ({{ $movie->year }})</a><br />
+            @endforeach
+        </div>
+    @endforeach
+    {{ $actors->links() }}
+@endsection
+```
+I denna fil använder vi den data som skickats till viewen, dvs actors (som i en view byter namn till $actors). Med hjälp av blades syntax skapar vi en foreach-loop i vilken alla värden i $actors gås igenom ett åt gången i form av $actor. Inne i den första foreach-loopen skapar vi ytterligare en, detta för att hantera de filmer som skådespelaren varit med i. Egenskapen movies är ju den vi skapade i Actor-modellen genom att utnyttja de två tabellernas relationer.
+
+Som du också ser ligger det en länk som pekar mot ```/movies/x``` där x ersätts med ett id-nummer. Denna route kommer att tas om hand av show-metoden i ActorControllern, som i sin tur levererar rätt data till viewen show.blade.php som också ligger i katalogen resources/views/actor.
+```php
+@extends('base')
+
+@section('main')
+    <div>
+        <h1>{{ $actor->name}}</h1>
+        <p>Kommer från {{ $actor->country }} </p>    
+        <h3>Har varit med i följande filmer</h3>
+        @foreach ($actor->movies as $movie)
+            <a href="/movies/{{$movie->id}} "> {{ $movie->title }}, ({{ $movie->year }}) </a><br/>
+        @endforeach
+    </div> 
+@endsection
+```
+Här hanterar vi också en egenskap som har sitt ursprung i en relation i modellen Actor, nämligen movies, som visar vilka filmer en actor varit med i.
+
+/Snart mer.
