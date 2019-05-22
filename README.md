@@ -479,4 +479,120 @@ $actor->movies // Visar info om vilka filmer skådespelaren varit med i. Kan var
 ## paus
 Gå och drick lite saft eller stå upp och sträck ut kroppen lite eller...
 
+## Views
+Nu är det dags att skapa views som kan visa all information på ett snyggt sätt. I katalogen ```resources/views``` skapar jag först två filer (base.blade.php och start.blade.php). Laravel använder ett så kallat **template-system** som heter blade, därav namnet på filerna.
 
+I base.blade.php lägger jag in generell info som gäller för alla mina webbsidor, dvs början på HTML-koden, HEAD-elementet med nödvändig info där etc. Utöver det skapar jag en yta (yield) där andra views kan lägga sin information/data.
+```php
+    <body>
+        <div class="container">
+                <div class="links">
+                    <a href="/actors">Actors</a>
+                    <a href="/movies">Movies</a>
+                </div>
+                @yield('main')
+        </div>
+    </body>
+</html>
+```
+I start.blade.php lägger jag enbart den info som ska ligga på startsidan. För att denna view ska kunna använda base.blade.php skriver jag följande kod:
+```php
+@extends('base')
+
+@section('main')
+
+    <h1>Hej och välkomna till Actors & Movies</h1>
+
+@endsection('main')
+```
+Extends betyder att den här viewen bygger på base(.blade.php), och section betyder att det som står mellan kommer att hamna i ytan "main".
+
+### View-kataloger
+För att hålla isär views som sysslar med olika saker, så är det bra att skapa kataloger i view. Mina heter "actor" och "movie", och båda innehåller filerna index.blade.php och show.blade.php. De här filerna heter detsamma som metoderna i respektive Controller, och det är en bra standard att följa, eftersom det underlättar när du felsöker.
+
+index.blade.php kommer att visa alla Actors eller Movies, medan show.blade.php kommer att visa en specifik Actor eller Movie. För att få detta att fungera så ska vi först editera metoderna i respektive Controller. Låt oss börja med ActorController.
+
+## Controller-metoder
+Index-metoden ska hämta alla actors och skicka dem till lämplig view, nämligen den index.blade.php som ligger i katalogen ```resources/views/actor```
+Därför skriver vi så här och använder då Actor-modellen.
+```php
+    public function index()
+    {
+        $actors = Actor::orderBy('name')->paginate(20);
+        return view('actor.index', [
+            'actors' => $actors
+        ]);
+    }
+```
+Variabeln $actors får värdet av vad Actor-modellen hämtar (orderBy()-tillägget sorterar och paginate() skapar en färdig paginering av så många objekt per sida.
+
+Metoden returnerar rätt view (här skriver vi katalog punkt view) och skickar även med en array som innehåller värden, i det här fallet lägger vi variabeln $actors som det värde som går under namnet actors inne i viewen. Lägg märke till att vi använder pluralformen actors och inte singularformen actor.
+
+I metoden show skickar vi in aktuell Actor som ett argument, så vi behöver inte göra mer än att omdirigera informationen.
+```php
+    public function show(Actor $actor)
+    {
+        return view('actor.show', [
+            'actor' => $actor
+        ]);
+    }
+```
+Som synes använder vi här singularformen actor, för att vara tydlig med att det bara rör sig om en actor, inte flera. 
+
+Vi skickar denna information till den view som anges (actor.show).
+
+### Skapa index- och show-views.
+Nu när vi har skapat de här metoderna är det dags att skriva ihop två views för actor. Vi börjar med index.blade.php (som ska ligga i resources/views/actor).
+```php
+@extends('base')
+
+@section('main')
+    @foreach($actors as $actor) 
+        <div class="actor">
+            <h1>{{ $actor->name }}</h1>
+            <h4>Har medverkat i följande filmer:</h4>
+            @foreach ($actor->movies as $movie)
+                <a href="/movies/{{$movie->id}}"> {{ $movie->title }}, ({{ $movie->year }})</a><br />
+            @endforeach
+        </div>
+    @endforeach
+    {{ $actors->links() }}
+@endsection
+```
+I denna fil använder vi den data som skickats till viewen, dvs actors (som i en view byter namn till $actors). Med hjälp av blades syntax skapar vi en foreach-loop i vilken alla värden i $actors gås igenom ett åt gången i form av $actor. Inne i den första foreach-loopen skapar vi ytterligare en, detta för att hantera de filmer som skådespelaren varit med i. Egenskapen movies är ju den vi skapade i Actor-modellen genom att utnyttja de två tabellernas relationer.
+
+Som du också ser ligger det en länk som pekar mot ```/movies/x``` där x ersätts med ett id-nummer. Denna route kommer att tas om hand av show-metoden i ActorControllern, som i sin tur levererar rätt data till viewen show.blade.php som också ligger i katalogen resources/views/actor.
+```php
+@extends('base')
+
+@section('main')
+    <div>
+        <h1>{{ $actor->name }}</h1>
+        <p>Kommer från {{ $actor->country }} </p>    
+        <h3>Har varit med i följande filmer</h3>
+        @foreach ($actor->movies as $movie)
+            <a href="/movies/{{ $movie->id }} "> {{ $movie->title }}, ({{ $movie->year }}) </a><br/>
+        @endforeach
+    </div> 
+@endsection
+```
+Här hanterar vi också en egenskap som har sitt ursprung i en relation i modellen Actor, nämligen movies, som visar vilka filmer en actor varit med i.
+
+När du skrivit ihop dessa views, så kan du skapa likadana i katalogen resource/views/movies.
+
+## Routes
+När våra view-filer är färdiga kan vi skriva in några nödvändiga rader i filen ```routes/web.php```. Denna fil använder vi för att sköta routingen på webbplatsen, dvs se till att vår applikation kan svara på inkommande förfrågningar, exempelvis när en användare skriver in en adress i webbläsarens adressfält eller klickar på en länk.
+
+Fyll på med dessa rader:
+```php
+Route::resource('/actors', 'ActorController');
+Route::resource('/movies', 'MovieController');
+```
+De innebär att webbplatsen kan svara på alla CRUD-relaterade routes enligt tabellen i länken nedan. CRUD är en akronym som betyder **Create Read Update Delete** och som brukar användas när vi pratar om databaser.
+[Tabell över hur en resource-controller fördelar routes](https://laravel.com/docs/5.8/controllers#resource-controllers)
+
+Hade vi inte haft dessa resource-routes och -controllers, så hade vi varit tvungna att skriva alla sju varianter själv, vilket gör att filen sväller ut snabbt.
+
+Så när en användare knappar in en adress på din webbplats som slutar med '/actors/25' så kommer den begäran att skickas till ActorControllerns show-metod som i sin tur returnerar info om denna skådespelare till rätt view.
+
+/mer snart.
