@@ -567,15 +567,32 @@ Som du också ser ligger det en länk som pekar mot ```/movies/x``` där x ersä
 
 @section('main')
     <div>
-        <h1>{{ $actor->name}}</h1>
+        <h1>{{ $actor->name }}</h1>
         <p>Kommer från {{ $actor->country }} </p>    
         <h3>Har varit med i följande filmer</h3>
         @foreach ($actor->movies as $movie)
-            <a href="/movies/{{$movie->id}} "> {{ $movie->title }}, ({{ $movie->year }}) </a><br/>
+            <a href="/movies/{{ $movie->id }} "> {{ $movie->title }}, ({{ $movie->year }}) </a><br/>
         @endforeach
     </div> 
 @endsection
 ```
 Här hanterar vi också en egenskap som har sitt ursprung i en relation i modellen Actor, nämligen movies, som visar vilka filmer en actor varit med i.
 
-/Snart mer.
+När du skrivit ihop dessa views, så kan du skapa likadana i katalogen resource/views/movies.
+
+## Routes
+När våra view-filer är färdiga kan vi skriva in några nödvändiga rader i filen ```routes/web.php```. Denna fil använder vi för att sköta routingen på webbplatsen, dvs se till att vår applikation kan svara på inkommande förfrågningar, exempelvis när en användare skriver in en adress i webbläsarens adressfält eller klickar på en länk.
+
+Fyll på med dessa rader:
+```php
+Route::resource('/actors', 'ActorController');
+Route::resource('/movies', 'MovieController');
+```
+De innebär att webbplatsen kan svara på alla CRUD-relaterade routes enligt tabellen i länken nedan. CRUD är en akronym som betyder **Create Read Update Delete** och som brukar användas när vi pratar om databaser.
+[Tabell över hur en resource-controller fördelar routes](https://laravel.com/docs/5.8/controllers#resource-controllers)
+
+Hade vi inte haft dessa resource-routes och -controllers, så hade vi varit tvungna att skriva alla sju varianter själv, vilket gör att filen sväller ut snabbt.
+
+Så när en användare knappar in en adress på din webbplats som slutar med '/actors/25' så kommer den begäran att skickas till ActorControllerns show-metod som i sin tur returnerar info om denna skådespelare till rätt view.
+
+/mer snart.
